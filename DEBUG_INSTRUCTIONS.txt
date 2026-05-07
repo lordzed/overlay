@@ -1,0 +1,127 @@
+DEBUGGING THE APP CRASH
+=======================
+
+The app is crashing silently because errors aren't visible in the command prompt.
+I've added error logging so we can see what's happening.
+
+STEP 1: Run the diagnostic script
+==================================
+
+Option A - Using Node.js (recommended):
+  node diagnose.js
+
+This will check:
+  - If config.json is valid
+  - If all required files exist
+  - If node_modules is installed
+  - If there are syntax errors
+
+Option B - Using npm:
+  npm list
+
+This shows all installed packages.
+
+
+STEP 2: Run the app with error logging
+=======================================
+
+Option A - Using batch script (Windows):
+  1. Double-click: run-debug.bat
+  2. App will start normally
+  3. When app closes, errors will be displayed
+
+Option B - Using PowerShell:
+  1. Open PowerShell
+  2. Navigate to the overlay folder
+  3. Run: powershell -ExecutionPolicy Bypass -File run-debug.ps1
+  4. Errors will be logged and displayed
+
+Option C - Manual console check:
+  1. Open command prompt in overlay folder
+  2. Run: npm start
+  3. Watch the console while app starts
+  4. Look for any red error text
+  5. After app closes, check if app-error.log was created:
+     - If it exists: type app-error.log
+     - If not: app started without crashing
+
+
+STEP 3: Capture the error message
+==================================
+
+After running the app, check for errors in this order:
+
+1. Look for app-error.log file in overlay folder
+   - If it exists, COPY THE ENTIRE CONTENT
+
+2. Look for app-output.log file in overlay folder
+   - If it exists, COPY THE ENTIRE CONTENT
+
+3. If no log files, try opening DevTools:
+   - App should be running
+   - Press F12 to open Developer Tools
+   - Go to Console tab (red area at bottom)
+   - Take a screenshot of any red errors
+
+
+STEP 4: Share the error
+=======================
+
+Once you have the error message, it will show:
+  - What went wrong
+  - Where in the code it happened
+  - The line number
+
+This will help identify the exact issue.
+
+
+COMMON ISSUES
+=============
+
+1. "Cannot find module 'electron'"
+   Solution: npm install
+
+2. "No monitors found"
+   Solution: This is a serious issue - check display connections
+   Run: diagnose.js and look at monitor detection
+
+3. "Invalid resolution format"
+   Solution: config.json has corrupted resolution field
+   Fix: Delete config.json and restart app
+
+4. "Window creation failed"
+   Solution: Electron BrowserWindow API issue
+   Check app-error.log for details
+
+
+FILE LOCATIONS
+==============
+
+- app-error.log     - All errors are logged here
+- app-output.log    - Console output is logged here
+- diagnose.js       - Run: node diagnose.js
+- run-debug.bat     - Windows batch launcher
+- run-debug.ps1     - PowerShell launcher
+
+
+QUICK TEST CHECKLIST
+====================
+
+□ 1. Run: node diagnose.js
+□ 2. All files exist (✓ marks)? 
+□ 3. electron is installed?
+□ 4. Run: npm start
+□ 5. App opens or closes?
+□ 6. Check app-error.log for errors
+□ 7. Share the error message
+
+
+NEXT STEPS
+==========
+
+Once you have the error message:
+1. Send me the content of app-error.log
+2. Or send a screenshot of the DevTools Console
+3. Or send the output from the debug launcher
+
+This will tell us exactly what's broken and how to fix it.

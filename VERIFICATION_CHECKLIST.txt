@@ -1,0 +1,190 @@
+═══════════════════════════════════════════════════════════════════════════════
+  VERIFICATION CHECKLIST - Window Size Resolution Fix
+═══════════════════════════════════════════════════════════════════════════════
+
+CHANGES MADE:
+─────────────────────────────────────────────────────────────────────────────
+
+[✓] main.js (lines 67-85)
+    • Added logging for resolution loading: "Resolution from config:"
+    • Added logging for parsed dimensions: "Parsed resolution:"
+    • Added logging for constrained dimensions: "Window size (after constraints):"
+    • Window size now properly parses and applies resolution from config
+
+[✓] main.js (lines 319-332) - save-config handler
+    • Enhanced logging to show old and new resolution values
+    • Logs comparison: oldResolution vs newResolution
+    • Logs comparison: oldMonitor vs newMonitor
+    • Clearly identifies what changed and whether window recreation is needed
+
+[✓] renderer.js (lines 408-434) - Save & Apply button handler
+    • Now compares old and new config
+    • Shows "Saved! Resizing to 1280x720..." when resolution/monitor changes
+    • Shows "Saved!" when only other settings changed
+    • Better user feedback about what's happening
+
+═══════════════════════════════════════════════════════════════════════════════
+  PRE-LAUNCH TESTS
+═══════════════════════════════════════════════════════════════════════════════
+
+Test 1: Fresh Start
+────────────────────────────────────────────────────────────────────────────
+[ ] Start app with: npm start
+[ ] Window appears at 1920x1080 (default)
+[ ] Console shows:
+    "Resolution from config: 1920x1080"
+    "Parsed resolution: { parsedWidth: 1920, parsedHeight: 1080 }"
+    "Window size (after constraints): { width: 1920, height: 1080, ... }"
+
+Test 2: Change Resolution
+────────────────────────────────────────────────────────────────────────────
+[ ] Open Settings (⚙ button)
+[ ] Change resolution to 1280x720
+[ ] Click "Save & Apply"
+[ ] Status message shows: "Saved! Resizing to 1280x720..."
+[ ] Window shrinks to 1280x720
+[ ] Console shows:
+    "Saving config... { oldResolution: '1920x1080', newResolution: '1280x720', resolutionChanged: true }"
+    "Resolution from config: 1280x720"
+    "Parsed resolution: { parsedWidth: 1280, parsedHeight: 720 }"
+    "Window size (after constraints): { width: 1280, height: 720, ... }"
+
+Test 3: Change Resolution Again
+────────────────────────────────────────────────────────────────────────────
+[ ] Open Settings (⚙ button)
+[ ] Change resolution to 1440x900
+[ ] Click "Save & Apply"
+[ ] Status shows: "Saved! Resizing to 1440x900..."
+[ ] Window resizes to 1440x900
+[ ] Confirm window size in console logs
+
+Test 4: Auto-Detect Resolution
+────────────────────────────────────────────────────────────────────────────
+[ ] Open Settings (⚙ button)
+[ ] Select your primary monitor from dropdown
+[ ] Click "Auto-Detect" button
+[ ] Resolution dropdown updates (should show monitor's native res)
+[ ] Click "Save & Apply"
+[ ] Window resizes to detected resolution
+[ ] Console confirms the change
+
+Test 5: Change Other Settings (No Resize)
+────────────────────────────────────────────────────────────────────────────
+[ ] Open Settings (⚙ button)
+[ ] Change Discord Token (don't click Connect, just save)
+[ ] Click "Save & Apply"
+[ ] Status shows: "Saved!" (not "Resizing...")
+[ ] Window stays open, no resize/flashing
+[ ] Console shows: "windowNeedsRecreation: false"
+
+Test 6: Change Monitor
+────────────────────────────────────────────────────────────────────────────
+[ ] Open Settings (⚙ button)
+[ ] Change monitor selection (if you have multiple monitors)
+[ ] Resolution auto-updates
+[ ] Click "Save & Apply"
+[ ] Status shows: "Saved! Resizing..."
+[ ] Window moves to selected monitor and resizes
+[ ] Console shows:
+    "Saving config... { monitorChanged: true, resolutionChanged: true, windowNeedsRecreation: true }"
+
+Test 7: Persistence
+────────────────────────────────────────────────────────────────────────────
+[ ] Set resolution to 1280x720
+[ ] Save and Apply
+[ ] Close the entire app
+[ ] Open Settings modal to verify dropdown shows 1280x720
+[ ] Check config.json contains: "resolution": "1280x720"
+[ ] Start app again
+[ ] Window should appear at 1280x720 (not default 1920x1080)
+[ ] Check console logs for correct resolution loading
+
+═══════════════════════════════════════════════════════════════════════════════
+  CONSOLE MESSAGES TO EXPECT
+═══════════════════════════════════════════════════════════════════════════════
+
+Success Case (Resolution Change):
+──────────────────────────────────────────────────────────────────────────────
+✓ Saving config... {
+    oldResolution: '1920x1080',
+    newResolution: '1280x720',
+    monitorChanged: false,
+    resolutionChanged: true,
+    windowNeedsRecreation: true
+  }
+✓ Config saved successfully
+✓ Monitor or resolution changed - recreating window...
+✓ Destroying old window...
+✓ Creating new window with updated settings...
+✓ Resolution from config: 1280x720
+✓ Parsed resolution: { parsedWidth: 1280, parsedHeight: 720 }
+✓ Window size (after constraints): { width: 1280, height: 720, monitorBounds: {...} }
+✓ New window loaded, showing...
+✓ New window shown
+
+Success Case (Non-Geometry Change):
+──────────────────────────────────────────────────────────────────────────────
+✓ Saving config... {
+    oldMonitor: '2779098405',
+    newMonitor: '2779098405',
+    oldResolution: '1280x720',
+    newResolution: '1280x720',
+    monitorChanged: false,
+    resolutionChanged: false,
+    windowNeedsRecreation: false
+  }
+✓ Config saved successfully
+✓ Only other settings changed - keeping window open
+
+═══════════════════════════════════════════════════════════════════════════════
+  TROUBLESHOOTING
+═══════════════════════════════════════════════════════════════════════════════
+
+Symptom: Window doesn't resize after changing resolution
+─────────────────────────────────────────────────────────
+[ ] Check console for errors during window creation
+[ ] Verify resolution format in config.json is "1280x720" not "1280 x 720"
+[ ] Check if console shows "Resolution from config:" with correct value
+[ ] Verify "windowNeedsRecreation: true" is logged
+[ ] Make sure you clicked "Save & Apply", not just changed dropdown
+
+Symptom: Resolution dropdown is empty after opening settings
+──────────────────────────────────────────────────────────────
+[ ] Check browser console for IPC errors
+[ ] Verify window.electron.getAvailableResolutions() call succeeds
+[ ] Check preload.js exposes the method correctly
+[ ] Reload page with F5 if needed
+
+Symptom: Settings not persisting after restart
+────────────────────────────────────────────────
+[ ] Verify config.json exists in the app directory
+[ ] Check if "resolution" field is present in config.json
+[ ] Delete config.json and restart app to regenerate with defaults
+[ ] Check file permissions on config.json
+
+Symptom: Window appears at wrong size on startup
+──────────────────────────────────────────────────
+[ ] Check config.json for "resolution" field
+[ ] Verify value format is correct: "1280x720" not "1280 x 720"
+[ ] Look in console for "Resolution from config:" log
+[ ] Delete config.json to reset to 1920x1080 default
+
+═══════════════════════════════════════════════════════════════════════════════
+  FILES MODIFIED
+═══════════════════════════════════════════════════════════════════════════════
+
+main.js
+  Line 67-85:    Enhanced resolution parsing with detailed logging
+  Line 319-332:  Enhanced save-config handler with comparison logging
+  
+renderer.js
+  Line 408-434:  Improved Save & Apply button handler with resolution feedback
+
+═══════════════════════════════════════════════════════════════════════════════
+  READY TO TEST ✓
+═══════════════════════════════════════════════════════════════════════════════
+
+All changes are in place. The window size should now properly match the 
+selected resolution.
+
+Next step: Run npm start and follow the test cases above.

@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' data: https://fonts.googleapis.com https://fonts.gstatic.com; img-src 'self' data: https://steamcdn-a.akamaihd.net https://cdn.akamai.steamstatic.com https://steamcommunity-a.akamaihd.net https://media.steampowered.com;">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Overlay</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+<div id="root">
+
+  <!-- System Stats -->
+  <div id="stats-widget" class="widget" style="top:20px;right:20px;">
+    <div class="widget-header">
+      <span class="widget-dot"></span>
+      <span class="widget-title">System</span>
+    </div>
+    <div class="widget-body">
+      <div class="metric">
+        <div class="metric-row">
+          <span class="metric-label">CPU</span>
+          <span id="cpu-value" class="metric-value">0%</span>
+        </div>
+        <div class="bar"><div id="cpu-bar" class="bar-fill" style="width:0%"></div></div>
+      </div>
+      <div class="metric">
+        <div class="metric-row">
+          <span class="metric-label">RAM</span>
+          <span id="mem-value" class="metric-value">0%</span>
+        </div>
+        <div class="bar"><div id="mem-bar" class="bar-fill" style="width:0%"></div></div>
+        <div id="mem-text" class="metric-sub">0 / 0 GB</div>
+      </div>
+      <div class="metric">
+        <div class="metric-row">
+          <span class="metric-label">GPU</span>
+          <span id="gpu-name" class="metric-value">Unknown</span>
+        </div>
+        <div class="bar"><div id="gpu-bar" class="bar-fill" style="width:0%"></div></div>
+        <div class="metric-sub">
+          <span id="gpu-usage" class="metric-value">0%</span> |
+          <span id="gpu-temp" class="metric-value">0°C</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Clock -->
+  <div id="clock-widget" class="widget" style="top:20px;left:50%;transform:translateX(-50%);">
+    <div id="clock-time" class="clock-time">00:00:00</div>
+    <div id="clock-date" class="clock-date">—</div>
+  </div>
+
+  <!-- Session -->
+  <div id="session-widget" class="widget" style="top:20px;left:20px;">
+    <div class="widget-header">
+      <span class="widget-dot"></span>
+      <span class="widget-title">Session</span>
+    </div>
+    <div class="widget-body">
+      <div id="session-time" class="session-time">00:00:00</div>
+      <div class="metric-sub">Active time</div>
+    </div>
+  </div>
+
+  <!-- Game Widget (hidden until game detected) -->
+  <div id="game-widget" class="widget hidden" style="bottom:20px;right:20px;">
+    <div class="widget-header">
+      <span class="widget-dot game-dot"></span>
+      <span id="game-name" class="widget-title game-title">—</span>
+      <span id="game-no-ach" class="metric-sub" style="margin-left:auto;display:none;">No achievements</span>
+    </div>
+
+    <!-- Tab bar (only shown when there are achievements) -->
+    <div id="game-tabs" class="tab-bar hidden">
+      <button class="tab-btn active" data-tab="progress">Progress</button>
+      <button class="tab-btn" data-tab="list">Achievements</button>
+    </div>
+
+    <!-- Progress tab -->
+    <div id="tab-progress" class="tab-content widget-body">
+      <div class="ach-summary">
+        <span id="ach-count" class="ach-count">0 / 0</span>
+        <span class="metric-sub">achievements unlocked</span>
+      </div>
+      <div class="bar tall">
+        <div id="ach-bar" class="bar-fill green" style="width:0%"></div>
+      </div>
+      <div id="ach-recent" class="ach-recent"></div>
+    </div>
+
+    <!-- List tab -->
+    <div id="tab-list" class="tab-content widget-body hidden">
+      <div class="ach-filter-row">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="locked">Locked</button>
+        <button class="filter-btn" data-filter="unlocked">Unlocked</button>
+      </div>
+      <div id="ach-list" class="ach-list"></div>
+    </div>
+  </div>
+
+  <!-- Settings Button (small floating button) -->
+  <button id="settings-btn" class="settings-btn" title="Open Settings">⚙</button>
+
+  <!-- Settings Modal (hidden by default) -->
+  <div id="settings-modal" class="settings-modal hidden">
+    <div class="settings-modal-content">
+      <div class="settings-modal-header">
+        <span class="widget-title">Settings</span>
+        <button id="settings-modal-close" class="settings-modal-close">✕</button>
+      </div>
+      <div class="settings-modal-body">
+        <label class="cfg-label">Steam API Key</label>
+        <input id="cfg-api-key" class="cfg-input" type="password" placeholder="Paste your API key…">
+        <label class="cfg-label" style="margin-top:10px;">Steam ID64</label>
+        <input id="cfg-steam-id" class="cfg-input" type="text" placeholder="e.g. 76561198012345678">
+
+        <div class="cfg-divider"></div>
+
+        <label class="cfg-label">Discord Token</label>
+        <input id="settings-discord-token" class="cfg-input" type="password" placeholder="Paste Discord token…">
+        <button id="settings-discord-connect-btn" class="cfg-save-btn" style="margin-top:8px;">Connect Discord</button>
+
+        <div class="cfg-divider"></div>
+
+        <label class="cfg-label">Overlay Monitor</label>
+        <select id="cfg-monitor" class="cfg-input">
+          <option value="">Loading monitors…</option>
+        </select>
+
+        <label class="cfg-label">Overlay Resolution</label>
+        <div style="display: flex; gap: 8px; align-items: center;">
+          <select id="cfg-resolution" class="cfg-input" style="flex: 1;">
+            <option value="">Loading resolutions…</option>
+          </select>
+          <button id="cfg-auto-resolution-btn" class="cfg-save-btn" style="margin: 0; padding: 6px 12px; white-space: nowrap;">Auto-Detect</button>
+        </div>
+
+        <div class="cfg-divider"></div>
+
+        <label class="cfg-label">Toggle Overlay <span class="cfg-label-hint">(show / hide)</span></label>
+        <div class="keybind-row">
+          <div id="kb-visibility" class="keybind-recorder" data-key="toggleVisibility" tabindex="0">—</div>
+          <button class="keybind-clear" data-target="kb-visibility">✕</button>
+        </div>
+
+        <label class="cfg-label" style="margin-top:10px;">Config Mode <span class="cfg-label-hint">(drag widgets)</span></label>
+        <div class="keybind-row">
+          <div id="kb-config" class="keybind-recorder" data-key="toggleConfig" tabindex="0">—</div>
+          <button class="keybind-clear" data-target="kb-config">✕</button>
+        </div>
+
+        <button id="cfg-save-btn" class="cfg-save-btn">Save &amp; Apply</button>
+        <div id="cfg-status" class="metric-sub" style="margin-top:6px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Discord Widget -->
+  <div id="discord-widget" class="widget" style="bottom:20px;left:20px;max-width:320px;">
+    <div class="widget-header">
+      <span class="widget-dot discord-dot"></span>
+      <span class="widget-title">Discord</span>
+      <button id="discord-refresh-btn" class="discord-refresh" title="Refresh messages">↻</button>
+    </div>
+
+    <!-- Chat interface -->
+    <div id="discord-chat" class="discord-chat">
+      <!-- Channel selector -->
+      <div class="discord-selector">
+        <select id="discord-channel-select" class="discord-select">
+          <option value="">Select a chat…</option>
+        </select>
+      </div>
+
+      <!-- Messages list -->
+      <div id="discord-messages" class="discord-messages"></div>
+
+      <!-- Message input -->
+      <div class="discord-input-row">
+        <input id="discord-message-input" class="discord-message-input" type="text" placeholder="Type message…" maxlength="2000">
+        <button id="discord-send-btn" class="discord-send-btn">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast"></div>
+
+</div>
+<script src="renderer.js"></script>
+</body>
+</html>

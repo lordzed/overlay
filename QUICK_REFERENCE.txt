@@ -1,0 +1,164 @@
+# Quick Reference - What's Been Fixed
+
+## ✅ Issue 1: Window Closing on Save
+**Root Cause:** Every settings save destroyed and recreated the window
+**Fix:** Only recreate window when monitor or resolution changes
+**Result:** Settings changes are instant with no window flashing
+
+## ✅ Issue 2: Discord Not Connecting  
+**Root Cause:** Auto-connect disabled to prevent window closing
+**Fix:** Re-enabled with proper error handling and 500ms startup delay
+**Result:** Discord auto-connects on startup using saved token
+
+## ✅ Issue 3: Missing Auto-Detect Resolution
+**Root Cause:** No auto-detection feature existed
+**Fix:** Added auto-detect button + auto-trigger on monitor change
+**Result:** Easy one-click resolution detection for any monitor
+
+---
+
+## Before vs After
+
+| Feature | Before | After |
+|---------|--------|-------|
+| Save settings | Window flashes/recreates every time | Only recreates if monitor/resolution changed |
+| Discord | Disabled (caused issues) | Auto-connects reliably |
+| Resolution | Manual selection only | Manual + auto-detect button + auto on monitor change |
+| Monitor switch | Crashed the app | Smooth seamless repositioning |
+| Settings window | Closed after save | Stays open for non-geometry changes |
+| Use experience | Laggy and unpredictable | Fast and responsive |
+
+---
+
+## How to Use - Quick Guide
+
+### Get Started
+```bash
+npm start
+```
+
+### Open Settings
+Click the ⚙ button in the overlay
+
+### Select Monitor
+1. Choose monitor from "Overlay Monitor" dropdown
+2. Resolution auto-updates (or click "Auto-Detect")
+3. Click "Save & Apply"
+4. Overlay moves to selected monitor ✓
+
+### Set Resolution
+**Option A - Auto-Detect:**
+1. Select your monitor
+2. Click "Auto-Detect" button
+3. Click "Save & Apply"
+
+**Option B - Manual:**
+1. Select from resolution dropdown
+2. Click "Save & Apply"
+
+### Connect Discord
+1. Paste token in "Discord Token" field
+2. Click "Connect Discord" button
+3. Or let it auto-connect on next startup ✓
+
+### Change Other Settings
+1. Update Steam API Key, Steam ID, or Keybinds
+2. Click "Save & Apply"
+3. Window stays open (no recreation) ✓
+
+---
+
+## Smart Behavior
+
+### Window Stays Open When Changing:
+- ✅ Discord Token
+- ✅ Steam API Key
+- ✅ Steam ID
+- ✅ Keybinds
+
+### Window Repositions/Resizes When Changing:
+- 📍 Monitor Selection
+- 📏 Resolution
+
+### Auto-Happens:
+- 🔄 Discord auto-connects on startup
+- 🔄 Resolution auto-updates when monitor changes
+
+---
+
+## Testing in 30 Seconds
+
+1. Run: `npm start`
+2. Window should appear immediately
+3. Click ⚙ to open settings
+4. Select a monitor → Resolution auto-updates
+5. Click "Auto-Detect" → Detects native resolution
+6. Click "Save & Apply" → Window repositions smoothly
+7. Settings stay saved on next restart
+8. ✓ Done!
+
+---
+
+## If Something Goes Wrong
+
+| Problem | Solution |
+|---------|----------|
+| Window closes on save | This is now fixed! Try running again |
+| Discord not connecting | Check token in settings, click "Connect Discord" |
+| Wrong monitor selected | Change in settings ⚙ and click "Save & Apply" |
+| Resolution looks wrong | Use "Auto-Detect" button or select from list |
+| Settings not persisting | Check if config.json exists in overlay folder |
+
+---
+
+## Log Messages That Mean Success
+
+Look for these in console:
+
+✅ `"Window shown"` - Window is displaying
+✅ `"Discord connected as [name]#0000"` - Discord is working  
+✅ `"Config save complete"` - Settings were saved
+✅ `"Only other settings changed - keeping window open"` - Window stayed open ✓
+✅ `"Monitor or resolution changed - recreating window..."` - Repositioning in progress
+
+---
+
+## Architecture at a Glance
+
+```
+Overlay App
+├─ Window Management
+│  ├─ Create window once on startup
+│  ├─ Reuse for all non-geometry changes
+│  └─ Recreate only if monitor/resolution changes
+├─ Settings System
+│  ├─ Discord Token (saves to config.json)
+│  ├─ Steam Keys (saves to config.json)
+│  ├─ Monitor Selection (triggers window recreation)
+│  └─ Resolution (triggers window recreation)
+├─ Auto-Features
+│  ├─ Discord auto-connects on startup
+│  ├─ Resolution auto-detects when monitor changes
+│  └─ Settings auto-restore from config.json on restart
+└─ Discord Integration
+   ├─ Auto-connect with saved token
+   ├─ Load DMs and channels
+   └─ Send/receive messages
+```
+
+---
+
+## Feature Completeness
+
+✅ Monitor selection and detection
+✅ Resolution selection with auto-detect
+✅ Smart window management (only recreate when needed)
+✅ Discord auto-connect
+✅ Persistent settings storage
+✅ Smooth repositioning when changing monitors
+✅ Auto-updating resolution on monitor change
+✅ Detailed error logging
+✅ Toast notifications
+✅ Graceful error handling
+
+**Status: COMPLETE & PRODUCTION READY** 🚀

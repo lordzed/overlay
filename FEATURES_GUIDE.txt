@@ -1,0 +1,227 @@
+# Complete Feature Overview - What's Ready Now
+
+## ✅ Features Implemented
+
+### 1. Monitor Selection
+```
+Settings Modal → "Overlay Monitor" Dropdown
+├─ Shows all connected displays
+├─ Displays monitor name and resolution
+└─ Marks primary monitor
+```
+
+### 2. Resolution Selection with Auto-Detect
+```
+Settings Modal → "Overlay Resolution" 
+├─ Dropdown with 6 preset resolutions
+│  ├─ 1920 x 1080 (Full HD)
+│  ├─ 1440 x 900
+│  ├─ 1280 x 720
+│  ├─ 1600 x 1024
+│  ├─ 1360 x 768
+│  └─ 1024 x 768
+└─ "Auto-Detect" Button
+   └─ Auto-detects selected monitor's native resolution
+```
+
+### 3. Smart Auto-Detection
+**Automatic:**
+- When you select a different monitor from the dropdown
+- Resolution automatically updates to that monitor's native size
+
+**Manual:**
+- Click "Auto-Detect" button
+- Shows toast with detected resolution
+
+### 4. Discord Auto-Connect
+- Auto-connects on startup with your saved token
+- No manual action needed (unless token needs updating)
+- Can still manually connect via settings if needed
+
+### 5. Persistent Settings
+```
+config.json stores:
+├─ monitorId: Which display to use
+├─ resolution: Selected resolution (e.g., "1920x1080")
+├─ steamApiKey: Your Steam API key
+├─ steamId: Your Steam ID
+├─ discordToken: Your Discord token
+└─ keybinds: Your keyboard shortcuts
+```
+
+## 🚀 How to Use
+
+### First Time Setup
+```
+1. npm start
+2. Click ⚙ (Settings button)
+3. Enter Steam API Key
+4. Enter Steam ID
+5. Paste Discord Token (optional - auto-connects if saved)
+6. Select Monitor (or leave default)
+7. Click Auto-Detect for resolution
+8. Click "Save & Apply"
+```
+
+### Switching Monitors
+```
+1. Click ⚙ (Settings button)
+2. Select different monitor from "Overlay Monitor"
+3. Resolution auto-updates (or click Auto-Detect)
+4. Click "Save & Apply"
+5. Overlay repositions to new monitor
+```
+
+### Manually Setting Resolution
+```
+1. Click ⚙ (Settings button)
+2. Select monitor (if needed)
+3. Choose resolution from dropdown
+4. Click "Save & Apply"
+```
+
+### Auto-Detecting Monitor Resolution
+```
+1. Click ⚙ (Settings button)
+2. Select monitor
+3. Click "Auto-Detect" button
+4. Resolution updates to monitor's native size
+5. Click "Save & Apply"
+```
+
+## 🔧 How It Works
+
+### Auto-Detect Flow
+```
+User selects monitor
+    ↓
+Monitor change event fires
+    ↓
+Auto-detect listener runs
+    ↓
+Finds selected monitor's dimensions (e.g., 2560x1600)
+    ↓
+Searches for matching preset resolution
+    ↓
+Sets resolution if found
+    ↓
+Shows toast: "Auto-detected: 2560x1600"
+```
+
+### Monitor Switching Flow
+```
+User selects new monitor & saves
+    ↓
+save-config handler called
+    ↓
+Config saved to disk
+    ↓
+Old window destroyed
+    ↓
+New window created at new position
+    ↓
+Window loads HTML & shows
+    ↓
+Overlay appears on new monitor
+```
+
+### Discord Auto-Connect Flow
+```
+Page loads
+    ↓
+500ms delay (prevents startup issues)
+    ↓
+discordInitFromConfig() runs
+    ↓
+Gets Discord token from config
+    ↓
+Calls discordConnect()
+    ↓
+Discord API call to verify token
+    ↓
+Toast: "Discord connected as [username]"
+    ↓
+Window stays visible & responsive
+```
+
+## ✨ What's New This Update
+
+| Feature | Before | After |
+|---------|--------|-------|
+| Discord | Manual button click | Auto-connects on startup |
+| Monitor | Had to select manually | Auto-detect on change |
+| Resolution | Manual selection only | Auto-detect button + auto on monitor change |
+| Window Switch | Crashed | Smooth repositioning |
+| Settings | Basic | Full auto-detect workflow |
+
+## 📋 Testing Scenarios
+
+### Scenario 1: Single Monitor
+1. Start app
+2. Overlay appears on your only monitor
+3. Discord auto-connects
+4. All widgets visible
+
+### Scenario 2: Multi-Monitor System
+1. Start app on primary monitor
+2. Open settings
+3. Select secondary monitor
+4. Click "Auto-Detect" or wait for auto-update
+5. Save settings
+6. Overlay moves to secondary monitor
+7. Switch back to primary - works seamlessly
+
+### Scenario 3: Custom Resolution
+1. Select monitor
+2. Choose custom resolution from dropdown
+3. Save
+4. Overlay resizes to that dimension
+
+### Scenario 4: Native Resolution
+1. Select monitor
+2. Click "Auto-Detect"
+3. Uses monitor's actual native resolution
+4. Saves and applies instantly
+
+## 🎯 Common Workflows
+
+**I want overlay on my second monitor at native resolution:**
+1. Click ⚙
+2. Select second monitor (resolution auto-updates)
+3. Click "Save & Apply" ✓
+
+**I want smaller overlay on primary monitor:**
+1. Click ⚙
+2. Monitor already selected (primary)
+3. Select 1280x720 from resolution dropdown
+4. Click "Save & Apply" ✓
+
+**I want Discord to connect automatically:**
+✓ Already enabled! Just save your token in settings once.
+
+**I want to change resolution without changing monitor:**
+1. Click ⚙
+2. Select different resolution
+3. Click "Save & Apply" ✓
+
+## 🚨 If Something Goes Wrong
+
+**Discord not connecting:**
+- Check token is valid
+- Try manually clicking "Connect Discord" in settings
+- Check console for Discord API errors
+
+**Monitor not switching:**
+- Check monitor is still connected
+- Try restarting app
+- Check console for window creation errors
+
+**Resolution not auto-detecting:**
+- Manual dropdown still works
+- Click "Auto-Detect" button again
+- Check if resolution option exists in dropdown
+
+**Window closes after settings:**
+- Check console for errors
+- Try closing settings before save
+- Restart app and try again
